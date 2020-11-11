@@ -5728,6 +5728,9 @@ public final class Settings {
         @Readable
         public static final String LOCKSCREEN_BATTERY_INFO = "lockscreen_battery_info";
 
+        /** @hide */
+        public static final String BACK_GESTURE_HEIGHT = "back_gesture_height";
+
         /**
          * Keys we no longer back up under the current schema, but want to continue to
          * process when restoring historical backup datasets.
