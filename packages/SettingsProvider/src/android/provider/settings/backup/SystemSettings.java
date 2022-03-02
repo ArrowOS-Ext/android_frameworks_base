@@ -94,5 +94,6 @@ public class SystemSettings {
         Settings.System.MAX_VISIBLE_NOTIFICATION_ICONS,
         Settings.System.ENABLE_FLOATING_ROTATION_BUTTON,
         Settings.System.STATUS_BAR_SHOW_ACTIVITY_INDICATORS,
+        Settings.System.USE_OLD_MOBILETYPE,
     };
 }
