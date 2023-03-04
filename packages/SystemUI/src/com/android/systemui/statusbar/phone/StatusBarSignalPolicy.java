@@ -19,7 +19,6 @@ package com.android.systemui.statusbar.phone;
 import android.annotation.NonNull;
 import android.content.Context;
 import android.os.Handler;
-import android.provider.Settings;
 import android.os.SystemProperties;
 import android.telephony.SubscriptionInfo;
 import android.util.ArraySet;
@@ -54,13 +53,8 @@ public class StatusBarSignalPolicy implements SignalCallback,
     private static final String TAG = "StatusBarSignalPolicy";
     private static final boolean DEBUG = Log.isLoggable(TAG, Log.DEBUG);
 
-<<<<<<< HEAD
-    private static final String SHOW_ACTIVITY_INDICATORS =
-            "system:" + Settings.System.STATUS_BAR_SHOW_ACTIVITY_INDICATORS;
     private static final String HIDE_QS_CALL_STRENGTH = "hide_qs_call_strength";        
 
-=======
->>>>>>> parent of aad61ab993c1 (SystemUI: Fix No Data Activity Indicator Issue)
     private final String mSlotAirplane;
     private final String mSlotMobile;
     private final String mSlotWifi;
@@ -135,12 +129,8 @@ public class StatusBarSignalPolicy implements SignalCallback,
             return;
         }
         mInitialized = true;
-<<<<<<< HEAD
         mTunerService.addTunable(this, StatusBarIconController.ICON_HIDE_LIST,
-                SHOW_ACTIVITY_INDICATORS, HIDE_QS_CALL_STRENGTH);
-=======
-        mTunerService.addTunable(this, StatusBarIconController.ICON_HIDE_LIST);
->>>>>>> parent of aad61ab993c1 (SystemUI: Fix No Data Activity Indicator Issue)
+                HIDE_QS_CALL_STRENGTH);
         mNetworkController.addCallback(this);
         mSecurityController.addCallback(this);
     }
@@ -176,34 +166,6 @@ public class StatusBarSignalPolicy implements SignalCallback,
     @Override
     public void onTuningChanged(String key, String newValue) {
         if (!StatusBarIconController.ICON_HIDE_LIST.equals(key)) {
-<<<<<<< HEAD
-            ArraySet<String> hideList = StatusBarIconController.getIconHideList(mContext, newValue);
-            boolean hideAirplane = hideList.contains(mSlotAirplane);
-            boolean hideMobile = hideList.contains(mSlotMobile);
-            boolean hideWifi = hideList.contains(mSlotWifi);
-            boolean hideEthernet = hideList.contains(mSlotEthernet);
-            boolean hideVpn = hideList.contains(mSlotVpn);
-            boolean hideRoaming = hideList.contains(mSlotRoaming);
-            boolean hideIms = hideList.contains(mSlotIms);
-
-            if (hideAirplane != mHideAirplane || hideMobile != mHideMobile
-                    || hideEthernet != mHideEthernet || hideWifi != mHideWifi
-                    || hideVpn != mHideVpn || hideRoaming != mHideRoaming
-                    || hideIms != mHideIms) {
-                mHideAirplane = hideAirplane;
-                mHideMobile = hideMobile;
-                mHideEthernet = hideEthernet;
-                mHideWifi = hideWifi;
-                mHideVpn = hideVpn;
-                mHideRoaming = hideRoaming;
-                mHideIms = hideIms;
-                // Re-register to get new callbacks.
-                mNetworkController.removeCallback(this);
-                mNetworkController.addCallback(this);
-            }
-        } else if (SHOW_ACTIVITY_INDICATORS.equals(key)) {
-            mActivityEnabled = TunerService.parseIntegerSwitch(newValue, true);
-=======
             return;
         }
         ArraySet<String> hideList = StatusBarIconController.getIconHideList(mContext, newValue);
@@ -212,16 +174,20 @@ public class StatusBarSignalPolicy implements SignalCallback,
         boolean hideWifi = hideList.contains(mSlotWifi);
         boolean hideEthernet = hideList.contains(mSlotEthernet);
         boolean hideVpn = hideList.contains(mSlotVpn);
+        boolean hideRoaming = hideList.contains(mSlotRoaming);
+        boolean hideIms = hideList.contains(mSlotIms);
 
         if (hideAirplane != mHideAirplane || hideMobile != mHideMobile
                 || hideEthernet != mHideEthernet || hideWifi != mHideWifi
-                || hideVpn != mHideVpn) {
+                || hideVpn != mHideVpn || hideRoaming != mHideRoaming
+                || hideIms != mHideIms) {
             mHideAirplane = hideAirplane;
             mHideMobile = hideMobile;
             mHideEthernet = hideEthernet;
             mHideWifi = hideWifi;
             mHideVpn = hideVpn;
->>>>>>> parent of aad61ab993c1 (SystemUI: Fix No Data Activity Indicator Issue)
+            mHideRoaming = hideRoaming;
+            mHideIms = hideIms;
             // Re-register to get new callbacks.
             mNetworkController.removeCallback(this);
             mNetworkController.addCallback(this);
