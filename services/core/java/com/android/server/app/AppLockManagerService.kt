@@ -746,10 +746,11 @@ class AppLockManagerService(
                         "user id $actualUserId")
                     return@withLock
                 }
-                if (config.hidePackage(packageName, hide)) {
-                    withContext(Dispatchers.IO) {
-                        config.write()
-                    }
+                if (!config.hidePackage(packageName, hide)) {
+                    return@withLock
+                }
+                withContext(Dispatchers.IO) {
+                    config.write()
                 }
             }
         }
@@ -871,10 +872,7 @@ class AppLockManagerService(
             PackageManager.MATCH_ALL.toLong(),
             currentUserId,
             Process.myUid()
-        ).filter {
-            Utils.launchablePackages(context).contains(it.packageName) ||
-                whiteListedSystemApps.contains(it.packageName)
-        }.map { it.packageName }
+        ).map { it.packageName }
         var changed = false
         logD {
             "Current packages = $currentPackages"
