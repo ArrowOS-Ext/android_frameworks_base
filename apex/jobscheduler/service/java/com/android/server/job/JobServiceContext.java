@@ -311,13 +311,11 @@ public final class JobServiceContext implements ServiceConnection {
                     bindFlags = Context.BIND_AUTO_CREATE | Context.BIND_NOT_FOREGROUND
                             | Context.BIND_ALMOST_PERCEPTIBLE
                             | Context.BIND_BYPASS_POWER_NETWORK_RESTRICTIONS
-                            | Context.BIND_NOT_APP_COMPONENT_USAGE
-                            | Context.BIND_DENY_ACTIVITY_STARTS_PRE_34;
+                            | Context.BIND_NOT_APP_COMPONENT_USAGE;
                 } else {
                     bindFlags = Context.BIND_AUTO_CREATE | Context.BIND_NOT_FOREGROUND
                             | Context.BIND_NOT_PERCEPTIBLE
-                            | Context.BIND_NOT_APP_COMPONENT_USAGE
-                            | Context.BIND_DENY_ACTIVITY_STARTS_PRE_34;
+                            | Context.BIND_NOT_APP_COMPONENT_USAGE;
                 }
                 binding = mContext.bindServiceAsUser(intent, this, bindFlags,
                         UserHandle.of(job.getUserId()));

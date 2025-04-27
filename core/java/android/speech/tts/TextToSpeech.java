@@ -2379,8 +2379,7 @@ public class TextToSpeech {
         boolean connect(String engine) {
             Intent intent = new Intent(Engine.INTENT_ACTION_TTS_SERVICE);
             intent.setPackage(engine);
-            return mContext.bindService(intent, this,
-                    Context.BIND_AUTO_CREATE | Context.BIND_DENY_ACTIVITY_STARTS_PRE_34);
+            return mContext.bindService(intent, this, Context.BIND_AUTO_CREATE);
         }
 
         @Override
