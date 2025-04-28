@@ -79,6 +79,7 @@ public class ClipboardListener implements
         mClipboardToast = clipboardToast;
         mClipboardManager = clipboardManager;
         mFeatureFlags = featureFlags;
+        mKeyguardManager = keyguardManager;
         mUiEventLogger = uiEventLogger;
     }
 
