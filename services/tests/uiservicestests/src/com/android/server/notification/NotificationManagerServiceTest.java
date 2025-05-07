@@ -10667,6 +10667,7 @@ public class NotificationManagerServiceTest extends UiServiceTestCase {
         assertFalse(n.hasColorizedPermission());
     }
 
+    @Test
     public void enqueueNotification_acceptsCorrectToken() throws RemoteException {
         Notification sent = new Notification.Builder(mContext, TEST_CHANNEL_ID)
                 .setContentIntent(createPendingIntent("content"))

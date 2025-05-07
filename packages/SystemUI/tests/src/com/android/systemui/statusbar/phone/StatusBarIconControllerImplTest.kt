@@ -47,6 +47,12 @@ class StatusBarIconControllerImplTest : SysuiTestCase() {
     fun setUp() {
         MockitoAnnotations.initMocks(this)
         iconList = StatusBarIconList(arrayOf())
+        underTest =
+            StatusBarIconControllerImpl(
+                context,
+                commandQueue,
+                mock(),
+                mock(),
                 mock(),
                 mock(),
                 iconList,
@@ -55,6 +61,7 @@ class StatusBarIconControllerImplTest : SysuiTestCase() {
         underTest.addIconGroup(iconGroup)
         val commandQueueCallbacksCaptor = kotlinArgumentCaptor<CommandQueue.Callbacks>()
         verify(commandQueue).addCallback(commandQueueCallbacksCaptor.capture())
+        commandQueueCallbacks = commandQueueCallbacksCaptor.value
     }
 
     /** Regression test for b/255428281. */

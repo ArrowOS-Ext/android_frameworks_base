@@ -232,6 +232,12 @@ public class AppOpsService extends IAppOpsService.Stub {
      *  {@link #upgradeLocked(int)} below. The first version was 1 */
     private static final int CURRENT_VERSION = 1;
 
+    /**
+     * The upper limit of total number of attributed op entries that can be returned in a binder
+     * transaction to avoid TransactionTooLargeException
+     */
+    private static final int NUM_ATTRIBUTED_OP_ENTRY_THRESHOLD = 2000;
+
     // Write at most every 30 minutes.
     static final long WRITE_DELAY = DEBUG ? 1000 : 30*60*1000;
 
@@ -2188,23 +2194,51 @@ public class AppOpsService extends IAppOpsService.Stub {
     private ArrayList<AppOpsManager.OpEntry> collectOps(Ops pkgOps, int[] ops) {
         ArrayList<AppOpsManager.OpEntry> resOps = null;
         final long elapsedNow = SystemClock.elapsedRealtime();
+        boolean shouldReturnRestrictedAppOps = mContext.checkPermission(
+                Manifest.permission.GET_APP_OPS_STATS,
+                Binder.getCallingPid(), Binder.getCallingUid())
+                == PackageManager.PERMISSION_GRANTED;
+        int totalAttributedOpEntryCount = 0;
+
         if (ops == null) {
             resOps = new ArrayList<>();
-            for (int j=0; j<pkgOps.size(); j++) {
+            for (int j = 0; j < pkgOps.size(); j++) {
                 Op curOp = pkgOps.valueAt(j);
-                resOps.add(getOpEntryForResult(curOp, elapsedNow));
+                if (opRestrictsRead(curOp.op) && !shouldReturnRestrictedAppOps) {
+                    continue;
+                }
+                if (totalAttributedOpEntryCount > NUM_ATTRIBUTED_OP_ENTRY_THRESHOLD) {
+                    break;
+                }
+                OpEntry opEntry = getOpEntryForResult(curOp, elapsedNow);
+                resOps.add(opEntry);
+                totalAttributedOpEntryCount += opEntry.getAttributedOpEntries().size();
             }
         } else {
-            for (int j=0; j<ops.length; j++) {
+            for (int j = 0; j < ops.length; j++) {
                 Op curOp = pkgOps.get(ops[j]);
                 if (curOp != null) {
+                    if (opRestrictsRead(curOp.op) && !shouldReturnRestrictedAppOps) {
+                        continue;
+                    }
                     if (resOps == null) {
                         resOps = new ArrayList<>();
                     }
-                    resOps.add(getOpEntryForResult(curOp, elapsedNow));
+                    if (totalAttributedOpEntryCount > NUM_ATTRIBUTED_OP_ENTRY_THRESHOLD) {
+                        break;
+                    }
+                    OpEntry opEntry = getOpEntryForResult(curOp, elapsedNow);
+                    resOps.add(opEntry);
+                    totalAttributedOpEntryCount += opEntry.getAttributedOpEntries().size();
                 }
             }
         }
+
+        if (totalAttributedOpEntryCount > NUM_ATTRIBUTED_OP_ENTRY_THRESHOLD) {
+            Slog.w(TAG, "The number of attributed op entries has exceeded the threshold. This "
+                    + "could be due to DoS attack from malicious apps. The result is throttled.");
+        }
+
         return resOps;
     }
 
@@ -4402,10 +4436,21 @@ public class AppOpsService extends IAppOpsService.Stub {
 
     private void verifyIncomingOp(int op) {
         if (op >= 0 && op < AppOpsManager._NUM_OP) {
-            // Enforce manage appops permission if it's a restricted read op.
+            // Enforce privileged appops permission if it's a restricted read op.
             if (opRestrictsRead(op)) {
-                mContext.enforcePermission(Manifest.permission.MANAGE_APPOPS,
-                        Binder.getCallingPid(), Binder.getCallingUid(), "verifyIncomingOp");
+                if (!(mContext.checkPermission(Manifest.permission.MANAGE_APPOPS,
+                        Binder.getCallingPid(), Binder.getCallingUid())
+                        == PackageManager.PERMISSION_GRANTED || mContext.checkPermission(
+                        Manifest.permission.GET_APP_OPS_STATS,
+                        Binder.getCallingPid(), Binder.getCallingUid())
+                        == PackageManager.PERMISSION_GRANTED || mContext.checkPermission(
+                        Manifest.permission.MANAGE_APP_OPS_MODES,
+                        Binder.getCallingPid(), Binder.getCallingUid())
+                        == PackageManager.PERMISSION_GRANTED)) {
+                    throw new SecurityException("verifyIncomingOp: uid " + Binder.getCallingUid()
+                            + " does not have any of {MANAGE_APPOPS, GET_APP_OPS_STATS, "
+                            + "MANAGE_APP_OPS_MODES}");
+                }
             }
             return;
         }

@@ -2138,6 +2138,10 @@ public class Notification implements Parcelable
             }
         }
 
+        private void visitUris(@NonNull Consumer<Uri> visitor) {
+            visitIconUri(visitor, getIcon());
+        }
+
         @Override
         public Action clone() {
             return new Action(
@@ -2826,7 +2830,7 @@ public class Notification implements Parcelable
 
         if (actions != null) {
             for (Action action : actions) {
-                visitIconUri(visitor, action.getIcon());
+                action.visitUris(visitor);
             }
         }
 
@@ -2906,6 +2910,11 @@ public class Notification implements Parcelable
 
         if (mBubbleMetadata != null) {
             visitIconUri(visitor, mBubbleMetadata.getIcon());
+        }
+
+        if (extras != null && extras.containsKey(WearableExtender.EXTRA_WEARABLE_EXTENSIONS)) {
+            WearableExtender extender = new WearableExtender(this);
+            extender.visitUris(visitor);
         }
     }
 
@@ -11658,6 +11667,12 @@ public class Notification implements Parcelable
                 mFlags |= mask;
             } else {
                 mFlags &= ~mask;
+            }
+        }
+
+        private void visitUris(@NonNull Consumer<Uri> visitor) {
+            for (Action action : mActions) {
+                action.visitUris(visitor);
             }
         }
     }
