@@ -54,10 +54,13 @@ public class StatusBarSignalPolicy implements SignalCallback,
     private static final String TAG = "StatusBarSignalPolicy";
     private static final boolean DEBUG = Log.isLoggable(TAG, Log.DEBUG);
 
+<<<<<<< HEAD
     private static final String SHOW_ACTIVITY_INDICATORS =
             "system:" + Settings.System.STATUS_BAR_SHOW_ACTIVITY_INDICATORS;
     private static final String HIDE_QS_CALL_STRENGTH = "hide_qs_call_strength";        
 
+=======
+>>>>>>> parent of aad61ab993c1 (SystemUI: Fix No Data Activity Indicator Issue)
     private final String mSlotAirplane;
     private final String mSlotMobile;
     private final String mSlotWifi;
@@ -132,8 +135,12 @@ public class StatusBarSignalPolicy implements SignalCallback,
             return;
         }
         mInitialized = true;
+<<<<<<< HEAD
         mTunerService.addTunable(this, StatusBarIconController.ICON_HIDE_LIST,
                 SHOW_ACTIVITY_INDICATORS, HIDE_QS_CALL_STRENGTH);
+=======
+        mTunerService.addTunable(this, StatusBarIconController.ICON_HIDE_LIST);
+>>>>>>> parent of aad61ab993c1 (SystemUI: Fix No Data Activity Indicator Issue)
         mNetworkController.addCallback(this);
         mSecurityController.addCallback(this);
     }
@@ -169,6 +176,7 @@ public class StatusBarSignalPolicy implements SignalCallback,
     @Override
     public void onTuningChanged(String key, String newValue) {
         if (!StatusBarIconController.ICON_HIDE_LIST.equals(key)) {
+<<<<<<< HEAD
             ArraySet<String> hideList = StatusBarIconController.getIconHideList(mContext, newValue);
             boolean hideAirplane = hideList.contains(mSlotAirplane);
             boolean hideMobile = hideList.contains(mSlotMobile);
@@ -195,10 +203,29 @@ public class StatusBarSignalPolicy implements SignalCallback,
             }
         } else if (SHOW_ACTIVITY_INDICATORS.equals(key)) {
             mActivityEnabled = TunerService.parseIntegerSwitch(newValue, true);
+=======
+            return;
+        }
+        ArraySet<String> hideList = StatusBarIconController.getIconHideList(mContext, newValue);
+        boolean hideAirplane = hideList.contains(mSlotAirplane);
+        boolean hideMobile = hideList.contains(mSlotMobile);
+        boolean hideWifi = hideList.contains(mSlotWifi);
+        boolean hideEthernet = hideList.contains(mSlotEthernet);
+        boolean hideVpn = hideList.contains(mSlotVpn);
+
+        if (hideAirplane != mHideAirplane || hideMobile != mHideMobile
+                || hideEthernet != mHideEthernet || hideWifi != mHideWifi
+                || hideVpn != mHideVpn) {
+            mHideAirplane = hideAirplane;
+            mHideMobile = hideMobile;
+            mHideEthernet = hideEthernet;
+            mHideWifi = hideWifi;
+            mHideVpn = hideVpn;
+>>>>>>> parent of aad61ab993c1 (SystemUI: Fix No Data Activity Indicator Issue)
             // Re-register to get new callbacks.
             mNetworkController.removeCallback(this);
             mNetworkController.addCallback(this);
-        }    
+        }
     }
 
     @Override
