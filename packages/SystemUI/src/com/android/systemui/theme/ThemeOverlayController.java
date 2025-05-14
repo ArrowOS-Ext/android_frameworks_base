@@ -546,7 +546,7 @@ public class ThemeOverlayController implements CoreStartable, Dumpable {
         });
         mConfigurationController.addCallback(mConfigurationListener);
     }
-    
+
     private void restartSystemUI() {
         Toast toast = Toast.makeText(mContext, R.string.restarting_systemui_msg, Toast.LENGTH_SHORT);
         toast.show();
@@ -557,10 +557,6 @@ public class ThemeOverlayController implements CoreStartable, Dumpable {
                 android.os.Process.killProcess(android.os.Process.myPid());
             }
         }, toast.getDuration() + 2000);
-    }
-
-    private void restartSystemUI() {
-        android.os.Process.killProcess(android.os.Process.myPid());
     }
 
     private void reevaluateSystemTheme(boolean forceReload) {
